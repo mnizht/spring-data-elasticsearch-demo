@@ -3,11 +3,16 @@ package com.example.elasticsearch.service;
 import com.example.elasticsearch.entity.Conference;
 import com.example.elasticsearch.repository.ConferenceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.geo.GeoPoint;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * @author haitao zhu
@@ -20,7 +25,20 @@ public class ConferenceService {
   private ElasticsearchOperations elasticsearchOperations;
   @Autowired
   private ConferenceRepository repository;
+  @Autowired
+  private PagingAndSortingRepository<Conference, String> pagingAndSortingRepository;
 
+  /**
+   * @param page 分页页码，从 0 开始
+   * @param size 尺寸
+   * @return
+   */
+  public Page<Conference> getPage(int page, int size, Sort sort) {
+    if (Objects.isNull(sort)) {
+      sort = Sort.unsorted();
+    }
+    return pagingAndSortingRepository.findAll(PageRequest.of(page, size, sort));
+  }
 
   public Iterable<Conference> getAll() {
     return repository.findAll();
