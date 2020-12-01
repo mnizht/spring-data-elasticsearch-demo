@@ -21,11 +21,14 @@ import java.util.List;
 public class Conference {
 
   @Id
+  @Field(type = FieldType.Keyword)
   private String id;
+  @Field(type = FieldType.Text, fielddata = true)
   private String name;
   @Field(type = FieldType.Date)
   private String date;
   private GeoPoint location;
+  @Field(type = FieldType.Keyword)
   private List<String> keywords;
 
   // do not remove it
