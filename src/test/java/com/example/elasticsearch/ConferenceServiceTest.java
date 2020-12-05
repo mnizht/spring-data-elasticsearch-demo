@@ -6,8 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 
-import java.util.function.Function;
-
 /**
  * @author haitao zhu
  * @date 2020/11/30 9:55
