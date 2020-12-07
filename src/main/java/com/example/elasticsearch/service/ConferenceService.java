@@ -1,24 +1,17 @@
 package com.example.elasticsearch.service;
 
 import com.example.elasticsearch.entity.Conference;
-import com.example.elasticsearch.entity.querydsl.QConference;
 import com.example.elasticsearch.repository.ConferencePagingAndSortingRepository;
 import com.example.elasticsearch.repository.ConferenceRepository;
-import com.example.elasticsearch.repository.ConferenceRepositoryQuerydslPredicate;
-import com.querydsl.core.types.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import java.time.ZonedDateTime;
-import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author haitao zhu
@@ -33,18 +26,33 @@ public class ConferenceService {
   private ConferenceRepository repository;
   @Autowired
   private ConferencePagingAndSortingRepository pagingAndSortingRepository;
-  @Autowired
-  private ConferenceRepositoryQuerydslPredicate querydslPredicate;
-  @PersistenceContext
-  private EntityManager em;
+
 
   private final Logger log = LoggerFactory.getLogger(ConferenceService.class);
 
-  public void querydslPredicateTest() {
-    QConference conference = QConference.conference;
-    Predicate predicate = conference.name.equalsIgnoreCase("name").and(conference.date.eq(ZonedDateTime.now()));
-    querydslPredicate.findAll(predicate);
+  // region C
+
+  /**
+   * @param dataList 数据列表
+   * @return 插入或修改的对象列表，插入的记录会补上id
+   */
+  public Iterable<Conference> insertDataSample(List<Conference> dataList) {
+    return repository.saveAll(dataList);
+    // Save data sample
+
   }
+
+  /**
+   * @param conference 对象参数。有id时会按新值修改，没id时会添加一条新记录。 允许字段被修改为null
+   * @return 修改或保存后的对象
+   */
+  public Conference saveOne(Conference conference) {
+    return repository.save(conference);
+  }
+
+  // endregion
+
+  // region R
 
   public Page<Conference> getPage(int page, int size) {
     Page<Conference> conferences = pagingAndSortingRepository.findAll(PageRequest.of(page, size));
@@ -54,22 +62,57 @@ public class ConferenceService {
     return conferences;
   }
 
-  public void insertDataSample() {
-    repository.deleteAll();
-    elasticsearchOperations.indexOps(Conference.class).refresh();
-
-
-    // Save data sample
-    repository.save(Conference.builder().date("2014-11-06").name("Spring eXchange 2014 - London")
-      .keywords(Arrays.asList("java", "spring")).location(new GeoPoint(51.500152D, -0.126236D)).build());
-    repository.save(Conference.builder().date("2014-12-07").name("Scala eXchange 2014 - London")
-      .keywords(Arrays.asList("scala", "play", "java")).location(new GeoPoint(51.500152D, -0.126236D)).build());
-    repository.save(Conference.builder().date("2014-11-20").name("Elasticsearch 2014 - Berlin")
-      .keywords(Arrays.asList("java", "elasticsearch", "kibana")).location(new GeoPoint(52.5234051D, 13.4113999))
-      .build());
-    repository.save(Conference.builder().date("2014-11-12").name("AWS London 2014")
-      .keywords(Arrays.asList("cloud", "aws")).location(new GeoPoint(51.500152D, -0.126236D)).build());
-    repository.save(Conference.builder().date("2014-10-04").name("JDD14 - Cracow")
-      .keywords(Arrays.asList("java", "spring")).location(new GeoPoint(50.0646501D, 19.9449799)).build());
+  /**
+   * @param name 全匹配名称
+   * @return 查询结果列表
+   */
+  public List<Conference> getListByName(String name) {
+    return repository.findByName(name);
   }
+
+  // endregion
+
+  // region U
+
+  /**
+   * @param conference 对象参数。有id时会按新值修改，没id时会添加一条新记录。 允许字段被修改为null
+   * @return 修改或保存后的对象
+   */
+  public Conference updateOne(Conference conference) {
+    return repository.save(conference);
+  }
+
+  // endregion
+
+  // region D
+
+  /**
+   * @param name 名字
+   * @return 按名字删除的记录数
+   */
+  public long deleteByName(String name) {
+    return repository.deleteByName(name);
+  }
+
+  /**
+   * @param name 名字
+   * @return 按名字移除的记录对象
+   */
+  public List<Conference> removeByName(String name) {
+    return repository.removeByName(name);
+  }
+
+  /**
+   * 清空当前的仓库
+   */
+  public void deleteAll() {
+    repository.deleteAll();
+    // 删除后手动刷新一次索引。
+    // 默认情况下，es每秒刷新一次，也可以修改刷新频率。 因为有这个刷新间隔，所以es是近实时的
+    elasticsearchOperations.indexOps(Conference.class).refresh();
+  }
+
+  // endregion
+
+
 }

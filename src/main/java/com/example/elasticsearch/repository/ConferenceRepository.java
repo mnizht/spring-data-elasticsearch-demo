@@ -18,4 +18,19 @@ public interface ConferenceRepository extends ElasticsearchRepository<Conference
   List<Conference> removeByName(String name);
 
   List<Conference> findByName(String name);
+
+  List<Conference> findByNameIgnoreCase(String name);
+
+  List<Conference> findByNameLike(String nameLike);
+
+  List<Conference> findByAgeGreaterThan(String nameLike);
+
+  List<Conference> findByAgeLessThan(String nameLike);
+
+  List<Conference> findByAgeBetween(int age1, int age2);
+
+  List<Conference> findByNameAndAgeOrderByDateAsc(String name, int age);
+
+  List<Conference> findByNameAndAgeOrderByDateDesc(String name, int age);
+
 }
