@@ -35,6 +35,21 @@ public class PersonServiceTest extends RootTest {
   }
 
   @Test
+  public void getTest() {
+    String id = "6666515670085275648";
+    String province = "6619846144140906496 ";
+    String city = "6619846561662898176 ";
+//    personService.getByProvinceAndCity(province, city).forEach(System.out::println);
+
+//    personService.getById(id).ifPresentOrElse(System.out::println, () -> log.error("id is error"));
+
+    String name = "三四五六七";
+    List<Person> byNameLike = personService.getByNameLike(name);
+    System.out.println("num: " + byNameLike.size());
+    byNameLike.forEach(System.out::println);
+  }
+
+  @Test
   public void getFamilyCountTest() {
     System.out.println("=============== Count ==============");
     inItPersonService.getFamilyCount().forEach(System.out::println);
@@ -57,5 +72,15 @@ public class PersonServiceTest extends RootTest {
         }
       }
     }
+  }
+
+  @Test
+  public void deleteTest() {
+    personService.deleteAll();
+  }
+
+  @Test
+  public void deleteIndex() {
+    System.out.println("删除成功：" + personService.deleteIndex());
   }
 }
