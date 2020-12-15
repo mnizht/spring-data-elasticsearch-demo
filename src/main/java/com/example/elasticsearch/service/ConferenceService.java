@@ -7,14 +7,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.geo.GeoPoint;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
-import java.util.Objects;
 
 /**
  * @author haitao zhu
@@ -29,20 +28,29 @@ public class ConferenceService {
   private ElasticsearchOperations elasticsearchOperations;
   @Autowired
   private ConferenceRepository repository;
-  @Autowired
-  private PagingAndSortingRepository<Conference, String> pagingAndSortingRepository;
 
-  /**
-   * @param page 分页页码，从 0 开始
-   * @param size 尺寸
-   * @return
-   */
-  public Page<Conference> getPage(int page, int size, Sort sort) {
-    if (Objects.isNull(sort)) {
-      sort = Sort.unsorted();
-    }
-    return pagingAndSortingRepository.findAll(PageRequest.of(page, size, sort));
+  // region CrudRepository
+
+  public void crud() {
+    System.out.println("========================= count =================================");
+    System.out.println("===== count = " + repository.count());
+
+    System.out.println("========================= sort =================================");
+//    repository.findAll(Sort.unsorted()).forEach(System.out::println);
+    repository.findAll(Sort.by("name").descending()).forEach(System.out::println);
+
+
+    System.out.println("========================= page =================================");
+    Pageable pageable = PageRequest.of(0, 2);
+//    repository.findAll(Pageable.unpaged());
+    Page<Conference> page = repository.findAll(pageable);
+    page.forEach(System.out::println);
+
+    System.out.println("========================= delete =================================");
+//    repository.deleteAll(page.getContent());
+
   }
+  // endregion
 
   public Iterable<Conference> getAll() {
     return repository.findAll();
