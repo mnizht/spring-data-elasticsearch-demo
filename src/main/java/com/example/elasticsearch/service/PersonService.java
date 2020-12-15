@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * @author haitao zhu
@@ -67,6 +68,14 @@ public class PersonService {
     return personRepository.findByProvinceAndCity(province, city);
   }
 
+  public List<Person> getByName(String name) {
+    return personRepository.findByName(name);
+  }
+
+  public List<Person> getByNameCustom(String name) {
+    return personRepository.findByNameCustom(name);
+  }
+
   /**
    * @param name 姓名
    * @return 模糊匹配人名
@@ -75,6 +84,28 @@ public class PersonService {
     return personRepository.findByNameLike(name);
   }
 
+  /**
+   * 自定义姓名匹配
+   *
+   * @param name 姓名
+   * @return 模糊匹配人名
+   */
+  public List<Person> getByNameLikeCustom(String name) {
+    return personRepository.findByNameLikeCustom(name);
+  }
+
+  /**
+   * Stream可能包装了特定于底层数据存储的资源，因此必须在使用后关闭。您可以使用close（）方法或使用Java 7 try-with-resources块来手动关闭Stream
+   */
+  public void findAllByCustomQuery() {
+    Stream<Person> stream1 = personRepository.findAllByCustomQueryAndStream();
+    stream1.forEach(System.out::println);
+    stream1.close();
+
+    try (Stream<Person> stream2 = personRepository.findAllByCustomQueryAndStream()) {
+      stream2.forEach(System.out::println);
+    }
+  }
 
   // endregion
 
