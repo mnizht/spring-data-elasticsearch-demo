@@ -28,7 +28,7 @@ public class ConferenceServiceTest extends RootTest {
 
   @Test
   public void getListByNameTest() {
-    String name = "JDD14 - Cracow";
+    String name = "remove";
     conferenceService.getListByName(name).forEach(System.out::println);
   }
 
@@ -36,7 +36,7 @@ public class ConferenceServiceTest extends RootTest {
   public void saveOneTest() {
     Conference conference = Conference.builder()
       .id(null)
-      .name("remove1")
+      .name("remove00059")
       .date("2020-12-07")
       .keywords(Arrays.asList("倒霉蛋", "罗翔", "三迟但到"))
       .location(new GeoPoint(52.5234051D, 13.4113999))

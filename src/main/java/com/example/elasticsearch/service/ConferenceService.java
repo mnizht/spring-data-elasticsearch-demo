@@ -99,7 +99,8 @@ public class ConferenceService {
    * @return 按名字移除的记录对象
    */
   public List<Conference> removeByName(String name) {
-    return repository.removeByName(name);
+    List<Conference> conferences = repository.removeByName(name);
+    return conferences;
   }
 
   /**
