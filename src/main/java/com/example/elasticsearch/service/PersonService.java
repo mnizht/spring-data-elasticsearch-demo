@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.UncategorizedElasticsearchException;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.Criteria;
 import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
 import org.springframework.data.elasticsearch.core.query.Query;
@@ -28,6 +29,8 @@ import java.util.stream.Stream;
 public class PersonService {
 
   private static final Logger log = LoggerFactory.getLogger(PersonService.class);
+  private final IndexCoordinates index = IndexCoordinates.of("person");
+
 
   @Autowired
   private PersonRepository personRepository;
@@ -144,17 +147,13 @@ public class PersonService {
   /**
    * 多条件组合搜索。。还没 看懂它的逻辑
    *
-   * @param param
+   * @param criteria
    * @return List<SearchHits < Person>>
    */
-  public SearchHits<Person> searchUseCriteria2(PersonSearchParam param) {
+  public SearchHits<Person> searchUseCriteria2(Criteria criteria) {
 
-    Criteria criteria = new Criteria("name").is(param.getName());
-    Criteria criteria1 = new Criteria("phone").is(param.getPhone());
-    criteria.and(criteria1);
     CriteriaQuery query = new CriteriaQuery(criteria);
-
-    return operations.search(query, Person.class);
+    return operations.search(query, Person.class, index);
 
   }
 

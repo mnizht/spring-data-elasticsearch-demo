@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.query.Criteria;
 
 import java.util.List;
 
@@ -114,10 +115,18 @@ public class PersonServiceTest extends RootTest {
     searchHits.forEach(hit -> hit.forEach(System.out::println));
   }
 
+  /**
+   * criteria 的 is() 方法，暂时不知道是否和查询的字段类型有关。比如 name.is 时，一个字就能查出数据，结果和 name.contains 相同、
+   * 但是 phone.is 如果号码不完整就什么都查不出来。
+   * 建议条件明确时用 is
+   */
   @Test
   public void getUseCriteria2Test() {
-    PersonSearchParam param = new PersonSearchParam().setName("海涛").setPhone("1573731");
-    SearchHits<Person> searchHits = personService.searchUseCriteria2(param);
+
+    Criteria criteria = new Criteria("id").is("6666516921040637952");
+//    Criteria criteria = new Criteria("name").is("海");
+//    criteria.and(new Criteria("phone").contains("1345678"));
+    SearchHits<Person> searchHits = personService.searchUseCriteria2(criteria);
     System.out.println(searchHits.toString());
     searchHits.forEach(System.out::println);
 
