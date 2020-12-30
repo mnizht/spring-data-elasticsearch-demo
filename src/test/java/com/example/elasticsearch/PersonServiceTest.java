@@ -1,14 +1,15 @@
 package com.example.elasticsearch;
 
 import com.example.elasticsearch.dto.PersonCountDTO;
-import com.example.elasticsearch.entity.OrgIdNameDTO;
 import com.example.elasticsearch.entity.Person;
+import com.example.elasticsearch.param.PersonSearchParam;
 import com.example.elasticsearch.service.InItDataService;
 import com.example.elasticsearch.service.PersonService;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.elasticsearch.core.SearchHits;
 
 import java.util.List;
 
@@ -61,7 +62,8 @@ public class PersonServiceTest extends RootTest {
   @Test
   public void getCustomTest() {
     String name = "家长";
-    List<Person> personList = personService.getByNameLikeCustom(name);
+//    List<Person> personList = personService.getByNameLikeCustom(name);
+    List<Person> personList = personService.getByName(name);
     System.out.println("num: " + personList.size());
     personList.forEach(System.out::println);
   }
@@ -94,6 +96,31 @@ public class PersonServiceTest extends RootTest {
         }
       }
     }
+  }
+
+  @Test
+  public void getUseCriteriaTest() {
+    PersonSearchParam param = new PersonSearchParam().setName("海涛").setPhone("157");
+    SearchHits<Person> searchHits = personService.searchUseCriteria(param);
+    System.out.println(searchHits.toString());
+    searchHits.stream().forEach(System.out::println);
+  }
+
+  @Test
+  public void getUseMultiCriteriaTest() {
+    PersonSearchParam param = new PersonSearchParam().setName("海涛").setPhone("13612341111");
+    List<SearchHits<Person>> searchHits = personService.searchUseMultiCriteria(param);
+    System.out.println(searchHits.toString());
+    searchHits.forEach(hit -> hit.forEach(System.out::println));
+  }
+
+  @Test
+  public void getUseCriteria2Test() {
+    PersonSearchParam param = new PersonSearchParam().setName("海涛").setPhone("1573731");
+    SearchHits<Person> searchHits = personService.searchUseCriteria2(param);
+    System.out.println(searchHits.toString());
+    searchHits.forEach(System.out::println);
+
   }
 
   @Test

@@ -1,14 +1,20 @@
 package com.example.elasticsearch.service;
 
 import com.example.elasticsearch.entity.Person;
+import com.example.elasticsearch.param.PersonSearchParam;
 import com.example.elasticsearch.repository.PersonRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.UncategorizedElasticsearchException;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.query.Criteria;
+import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
+import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -105,6 +111,51 @@ public class PersonService {
     try (Stream<Person> stream2 = personRepository.findAllByCustomQueryAndStream()) {
       stream2.forEach(System.out::println);
     }
+  }
+
+  /**
+   * 单条件搜索
+   *
+   * @param param
+   * @return SearchHits<Person>
+   */
+  public SearchHits<Person> searchUseCriteria(PersonSearchParam param) {
+    Criteria criteria = new Criteria("name").is(param.getName());
+    Query query = new CriteriaQuery(criteria);
+    return operations.search(query, Person.class);
+
+  }
+
+  /**
+   * 多条件搜索。相当于每个条件都单独搜索一次，返回多次搜索结果的集合
+   *
+   * @param param
+   * @return List<SearchHits < Person>>
+   */
+  public List<SearchHits<Person>> searchUseMultiCriteria(PersonSearchParam param) {
+    List<Query> queries = new ArrayList<>();
+    queries.add(new CriteriaQuery(new Criteria("name").is(param.getName())));
+    queries.add(new CriteriaQuery(new Criteria("phone").is(param.getPhone())));
+
+    return operations.multiSearch(queries, Person.class);
+
+  }
+
+  /**
+   * 多条件组合搜索。。还没 看懂它的逻辑
+   *
+   * @param param
+   * @return List<SearchHits < Person>>
+   */
+  public SearchHits<Person> searchUseCriteria2(PersonSearchParam param) {
+
+    Criteria criteria = new Criteria("name").is(param.getName());
+    Criteria criteria1 = new Criteria("phone").is(param.getPhone());
+    criteria.and(criteria1);
+    CriteriaQuery query = new CriteriaQuery(criteria);
+
+    return operations.search(query, Person.class);
+
   }
 
   // endregion
