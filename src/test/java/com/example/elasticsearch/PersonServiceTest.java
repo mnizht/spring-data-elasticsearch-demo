@@ -133,6 +133,14 @@ public class PersonServiceTest extends RootTest {
   }
 
   @Test
+  public void getUseCriteria2Test2() {
+    Criteria criteria = new Criteria("tagGroups.name").is("教育意识");
+    SearchHits<Person> searchHits = personService.searchUseCriteria2(criteria);
+    System.out.println(searchHits.toString());
+    searchHits.forEach(System.out::println);
+  }
+
+  @Test
   public void deleteTest() {
     personService.deleteAll();
   }
